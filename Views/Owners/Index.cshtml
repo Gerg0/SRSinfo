@@ -1,0 +1,149 @@
+﻿@model IEnumerable<SRSinfo.Models.Owner>
+@*@model IEnumerable<Tuple<Owner,spCarData>>*@
+@*@model IEnumerable<SRSinfo.ViewModels.CarsAndOwner>*@
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BirthDate)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BirthDate)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+                <td>
+                    <button class="btn btn-primary" onclick="FetchData(@item.Id)" type="button" data-toggle="modal" data-target="#cars">
+                        Cars
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="container">
+    <div class="modal fade" id="cars">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title">Cars owned by this person</h1>
+                </div>
+                <div class="modal-body">
+                    <table id="tblcars" class="table"></table>
+                    @*<table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.carDataModel.Id)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.carDataModel.Manufacturer)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.carDataModel.Type)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.carDataModel.LicensePlateNum)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.carDataModel.ProductionDate)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.carDataModel.Id)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.carDataModel.Manufacturer)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.carDataModel.Type)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.carDataModel.LicensePlateNum)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.carDataModel.ProductionDate)
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>*@
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@*<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>*@
+<script type="text/javascript">
+    function FetchData(id) {
+        $.ajax({
+            method: "GET",
+            url: "/Owners/CarsOwned",
+            data: { ownerid: id },
+            async: true,
+            success: function (data) {
+                var jsonObj = data;
+                var strHTML = '<thead><tr><th>Id</th><th>Manufacturer</th><th>Type</th><th>LicensePlateNum</th><th>ProductionDate</th></tr></thead><tbody>';
+
+                $(jsonObj).each(function () {
+                    var row = $(this)[0];
+                    strHTML += '<tr><td>' + row["id"] + '</td><td>' + row['manufacturer'] +
+                        '</td><td>' + row['type'] + '</td><td>' + row['licensePlateNum'] + '</td><td>' + row['productionDate'] + '</td></tr>';
+                });
+                strHTML += '</tbody>'
+                $('#tblcars').html(strHTML);
+            },
+            error: function () {
+                alert('some error occured');
+            }
+        });
+    }
+</script>
